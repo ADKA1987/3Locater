@@ -2,6 +2,7 @@ package a3locater.tre.se.a3locater;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NdefMessage;
@@ -11,6 +12,7 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -28,6 +30,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
@@ -40,7 +46,7 @@ public class MainActivity extends AppCompatActivity
     private boolean doubleBackToExitPressedOnce = false;
     public static final String TAG = "NfcDemo";
     private TextView floorTextView, areaTextView,deskTextView;
-    private TextView userEmail;
+    private TextView userEmail,userName;
     private Intent intent;
     private NavigationView navigationView;
     private View headerView;
@@ -53,6 +59,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         Intent mIntent = getIntent();
         intent = new Intent(getApplicationContext(), LoginActivity.class);
+
         floorTextView = (TextView) findViewById(R.id.textViewFloor);
         areaTextView = (TextView) findViewById(R.id.textViewArea);
         deskTextView = (TextView) findViewById(R.id.textViewDesk);
@@ -62,8 +69,11 @@ public class MainActivity extends AppCompatActivity
         headerView = navigationView.getHeaderView(0);
 
         userEmail = (TextView) headerView.findViewById(R.id.userEmail);
+        userName = (TextView) headerView.findViewById(R.id.userName);
 
         userEmail.setText(""+mIntent.getSerializableExtra("Email"));
+        userName.setText(""+mIntent.getSerializableExtra("name"));
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,6 +192,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         }else if (id == R.id.nav_logout){
+            File dir = getFilesDir();
+            File file = new File(dir, "mytextfile.txt");
+            boolean deleted = file.delete();
             startActivity(intent);
         }
 
@@ -314,4 +327,5 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
         }
     }
 }
+
 }

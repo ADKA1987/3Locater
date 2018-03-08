@@ -1,4 +1,4 @@
-package a3locater.tre.se.a3locater;
+package a3locater.tre.se.a3locater.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
