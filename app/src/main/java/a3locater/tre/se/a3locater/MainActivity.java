@@ -179,17 +179,11 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_profile) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_intranet) {
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        }  else if (id == R.id.nav_search) {
 
         }else if (id == R.id.nav_logout){
             File dir = getFilesDir();
@@ -273,6 +267,9 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
 
         NdefRecord[] records = ndefMessage.getRecords();
         for (NdefRecord ndefRecord : records) {
+
+
+
             if (ndefRecord.getTnf() == NdefRecord.TNF_WELL_KNOWN && Arrays.equals(ndefRecord.getType(), NdefRecord.RTD_TEXT)) {
                 try {
                     return readText(ndefRecord);
@@ -318,7 +315,6 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
             String floor=  String.valueOf(result).substring(1,3);
             String area=  String.valueOf(result).substring(4,6);
             String desk=  String.valueOf(result).substring(7,9);
-
              //String.valueOf(result).getChars(1,2,area,0);
             //String.valueOf(result).getChars(1,2,desk,0);
             floorTextView.setText("Floor: "+floor);
