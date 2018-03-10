@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="top|center"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         tools:layout_editor_absoluteY="25dp"
         tools:ignore="MissingConstraints">
 
@@ -21,7 +21,6 @@
             android:id="@+id/textViewFloor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Floor"
             tools:layout_editor_absoluteX="141dp"
             tools:layout_editor_absoluteY="65dp" />
 
@@ -29,7 +28,6 @@
             android:id="@+id/textViewArea"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Area"
             tools:layout_editor_absoluteX="141dp"
             tools:layout_editor_absoluteY="65dp" />
 
@@ -37,10 +35,28 @@
             android:id="@+id/textViewDesk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Desk"
             tools:layout_editor_absoluteX="141dp"
             tools:layout_editor_absoluteY="65dp" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/JSON_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
+    </LinearLayout>
+    <ScrollView
+        android:id="@+id/search_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/searchList"
+        android:layout_width="match_parent"
+        android:layout_height="375dp"
+        android:layout_gravity="center"
+        android:gravity="top|center"
+        android:orientation="vertical"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="83dp"></LinearLayout>
+    </ScrollView>
 </android.support.constraint.ConstraintLayout>

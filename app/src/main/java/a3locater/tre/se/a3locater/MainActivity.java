@@ -2,7 +2,6 @@ package a3locater.tre.se.a3locater;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NdefMessage;
@@ -12,7 +11,6 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,23 +19,26 @@ import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import org.json.JSONObject;
+import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 import java.util.Arrays;
-
-import static a3locater.tre.se.a3locater.MainActivity.TAG;
+import java.util.List;
+import a3locater.tre.se.a3locater.domain.EmployeeNames;
+import a3locater.tre.se.a3locater.util.Search;
+import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -51,30 +52,34 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
     private View headerView;
     private NfcAdapter mNfcAdapter;
+    private EditText searchText;
+    private ImageButton searchBtn;
+    private String createUrl= "https://fastvedio.herokuapp.com/create/";
+    private String searchUrl = "https://fastvedio.herokuapp.com/search/";
 
+    private List<EmployeeNames> employeeNamesList;
+    private String  responseStatus;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         Intent mIntent = getIntent();
         intent = new Intent(getApplicationContext(), LoginActivity.class);
-
-        floorTextView = (TextView) findViewById(R.id.textViewFloor);
-        areaTextView = (TextView) findViewById(R.id.textViewArea);
-        deskTextView = (TextView) findViewById(R.id.textViewDesk);
+        //searchText = (EditText) findViewById(R.id.searchText);
+        floorTextView = findViewById(R.id.textViewFloor);
+        areaTextView =  findViewById(R.id.textViewArea);
+        deskTextView =   findViewById(R.id.textViewDesk);
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        setSupportActionBar(toolbar);
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView =  findViewById(R.id.nav_view);
         headerView = navigationView.getHeaderView(0);
 
-        userEmail = (TextView) headerView.findViewById(R.id.userEmail);
-        userName = (TextView) headerView.findViewById(R.id.userName);
-
+        userEmail =   headerView.findViewById(R.id.userEmail);
+        userName =   headerView.findViewById(R.id.userName);
+        searchBtn =   findViewById(R.id.searchBtn);
         userEmail.setText(""+mIntent.getSerializableExtra("Email"));
         userName.setText(""+mIntent.getSerializableExtra("name"));
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        searchText = findViewById(R.id.searchText);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,13 +88,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        DrawerLayout drawer =   findViewById(R.id.drawer_layout);
+        NavigationView navigationView =  findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         if (mNfcAdapter == null) {
             // Stop here, we definitely need NFC
@@ -101,6 +101,45 @@ public class MainActivity extends AppCompatActivity
         if (!mNfcAdapter.isEnabled()) {
             Toast.makeText(this, "NFC is disabled.", Toast.LENGTH_LONG).show();
         }
+        searchText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchText.setText(null);
+            }
+        });
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(null == searchText.getText().toString() ||searchText.getText().toString().isEmpty() ){
+                    searchText.setText("Nothing to search for..");
+                }else {
+                    AsyncTask<String, String, EmployeeNames> execute = new Search(searchUrl , searchText.getText().toString()).execute();
+                    try {
+                        System.out.println(execute.get());
+                        setEmployeesNames(execute.get());
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    private void setEmployeesNames(EmployeeNames employeeNames) {
+        LinearLayout layout = findViewById(R.id.searchList);
+
+
+        TextView dynamicTextView = new TextView(this);
+        dynamicTextView.setTextSize(20);
+        dynamicTextView.setPadding(20, 300, 20, 100);
+        dynamicTextView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        dynamicTextView.setText(employeeNames.getEmpName() +" "+ employeeNames.getLocation() +" "+ employeeNames.getLocationImage());
+        layout.addView(dynamicTextView);
+
+            //this.setContentView(layout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
     }
 
     @Override
@@ -180,11 +219,14 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_profile) {
-            // Handle the camera action
+            Intent intranetIntent = new Intent(getApplicationContext(), ProfileActivity.class);
+            startActivity(intranetIntent);
         } else if (id == R.id.nav_intranet) {
-
+            Intent intranetIntent = new Intent(getApplicationContext(), IntranetActivity.class);
+            startActivity(intranetIntent);
         }  else if (id == R.id.nav_search) {
-
+            Intent intranetIntent = new Intent(getApplicationContext(), SearchActivity.class);
+            startActivity(intranetIntent);
         }else if (id == R.id.nav_logout){
             File dir = getFilesDir();
             File file = new File(dir, "mytextfile.txt");
@@ -311,17 +353,63 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
     @Override
     protected void onPostExecute(String result) {
          if (result != null) {
-            System.out.println("Floor: "+result);
-            String floor=  String.valueOf(result).substring(1,3);
-            String area=  String.valueOf(result).substring(4,6);
-            String desk=  String.valueOf(result).substring(7,9);
-             //String.valueOf(result).getChars(1,2,area,0);
-            //String.valueOf(result).getChars(1,2,desk,0);
-            floorTextView.setText("Floor: "+floor);
-            areaTextView.setText("Area: "+area);
-            deskTextView.setText("Desk: "+desk);
-        }
-    }
-}
+             String floor = String.valueOf(result).substring(1, 3);
+             String area = String.valueOf(result).substring(4, 6);
+             String desk = String.valueOf(result).substring(7, 9);
+             floorTextView.setText("Floor: " + floor);
+             areaTextView.setText(", Area: " + area);
+             deskTextView.setText(", Desk: " + desk);
+             String status = sendPost(result);
 
+             if(String.valueOf(status) == String.valueOf(200)){
+                 deskTextView.setText("Desk: Success" );
+             }else{
+                 deskTextView.setText("Desk: Faild" );
+             }
+         }
+    }
+    }
+
+    public String sendPost(String result) {
+        final String location = result.toString();
+        Thread thread = new Thread(new Runnable() {
+
+
+            @Override
+            public void run() {
+                try {
+                    URL regUrl = new URL(createUrl);
+                    HttpURLConnection conn = (HttpURLConnection) regUrl.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+                    conn.setRequestProperty("Accept","application/json");
+                    conn.setDoOutput(true);
+                                       conn.setDoInput(true);
+
+                    JSONObject jsonParam = new JSONObject();
+                    jsonParam.put("empEmail", userEmail.getText());
+                    jsonParam.put("location", location);
+                  //  jsonParam.put("Area", area);
+                   // jsonParam.put("Location", desk);
+
+                    Log.i("JSON", jsonParam.toString());
+                    DataOutputStream os = new DataOutputStream(conn.getOutputStream());
+                    os.writeBytes(URLEncoder.encode(jsonParam.toString(), "UTF-8"));
+                    os.writeBytes(jsonParam.toString());
+                    os.flush();
+                    os.close();
+                    responseStatus = String.valueOf(conn.getResponseCode());
+                    Log.i("STATUS", String.valueOf(conn.getResponseCode()));
+                    Log.i("MSG" , conn.getResponseMessage());
+                    conn.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
+
+        return responseStatus;
+    }
 }

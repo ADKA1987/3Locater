@@ -39,9 +39,11 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private Intent intent;
     private String email;
+    private String name,id;
     private boolean doubleBackToExitPressedOnce = false;
     static final int READ_BLOCK_SIZE = 500;
     private String userInfo = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,15 +51,16 @@ public class LoginActivity extends AppCompatActivity {
         boolean fileStatus = alreadyLoggedIn();
         intent = new Intent(getApplicationContext(), MainActivity.class);
         if (fileStatus) {
-            intent.putExtra("Email", "Alaa.alaleiwi@tre.se");
-            intent.putExtra("name", "Alaa");
+
+            intent.putExtra("Email", email);
+            intent.putExtra("name", name);
             intent.putExtra("id", "id");
             startActivity(intent);
         }
-        mEmailView = (EditText) findViewById(R.id.email);
-        mLoginError = (TextView) findViewById(R.id.loginError);
+        mEmailView = findViewById(R.id.email);
+        mLoginError =  findViewById(R.id.loginError);
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,65 +86,47 @@ public class LoginActivity extends AppCompatActivity {
         }, 2000);
     }
 
-    private void userLogin() {
-        email = mEmailView.getText().toString().trim();
-        if (TextUtils.isEmpty(email)) {
-            Toast.makeText(this, "Please enter your email", Toast.LENGTH_LONG).show();
-            return;
-        }else{
-            checkUserLogin();
-        }
-        progressDialog.setMessage("Loging in  Please Wait...");
-        progressDialog.show();
-        //Add Login method
-    }
-
     private void checkUserLogin() {
+             email = mEmailView.getText().toString().trim();
+            if (TextUtils.isEmpty(email)) {
+                Toast.makeText(this, "Please enter email", Toast.LENGTH_LONG).show();
+                return;
+            }else {
+                RequestQueue queue  = Volley.newRequestQueue(this);
+                String url = "https://fastvedio.herokuapp.com/read/"+email+".";
+                JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                        (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
-        email = mEmailView.getText().toString().trim();
-        if (TextUtils.isEmpty(email)) {
-            Toast.makeText(this, "Please enter email", Toast.LENGTH_LONG).show();
-            return;
-        }else {
-            RequestQueue queue  = Volley.newRequestQueue(this);
-            String url = "https://fastvedio.herokuapp.com/read/"+email+".";
-            JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            if (null== response) {
-                                Toast.makeText(getApplicationContext(), (CharSequence) "Incorrect Email.", Toast.LENGTH_SHORT).show();
-                                System.out.println("Response: " + response.toString());
-                            }else{
-                                intent = new Intent(getApplicationContext(), MainActivity.class);
-                                try {
-                                    intent.putExtra("Email", response.get("email").toString());
-                                    intent.putExtra("name", response.get("name").toString());
-                                    intent.putExtra("id", response.get("id").toString());
-                                    String data = ""+intent.getSerializableExtra("Email") +intent.getSerializableExtra("name");
-                                    writeToFile(data);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                if (null== response) {
+                                    Toast.makeText(getApplicationContext(), (CharSequence) "Incorrect Email.", Toast.LENGTH_SHORT).show();
+                                    System.out.println("Response: " + response.toString());
+                                }else{
+                                    intent = new Intent(getApplicationContext(), MainActivity.class);
+                                    try {
+                                        intent.putExtra("Email", response.get("email").toString());
+                                        intent.putExtra("name", response.get("name").toString());
+                                        intent.putExtra("id", response.get("id").toString());
+                                        StringBuffer buf = new StringBuffer ();
+                                        String data =  buf.append(intent.getSerializableExtra("Email")).append(",").append(intent.getSerializableExtra("name")).toString();
+                                        writeToFile(data);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    startActivity(intent);
                                 }
-                                startActivity(intent);
+                                System.out.println("Response: " + response.toString());
                             }
-                            System.out.println("Response: " + response.toString());
-                        }
-                    }, new Response.ErrorListener() {
+                        }, new Response.ErrorListener() {
 
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(getApplicationContext(), "An error occurred.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(getApplicationContext(), "An error occurred.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             // Access the RequestQueue through your singleton class.
             MySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
-
-
-
         }
 
     }
@@ -161,6 +146,9 @@ public class LoginActivity extends AppCompatActivity {
                 while ((charRead = InputRead.read(inputBuffer)) > 0) {
                     // char to string conversion
                     String readstring = String.copyValueOf(inputBuffer, 0, charRead);
+                    String[] ar=readstring.split(",");
+                    email = ar[0].toString();
+                    name = ar[1].toString();
                     userInfo += readstring;
 
                 }
