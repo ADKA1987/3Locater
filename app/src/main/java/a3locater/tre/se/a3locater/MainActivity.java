@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -22,11 +23,17 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONObject;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -34,11 +41,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.Arrays;
-import java.util.List;
-import a3locater.tre.se.a3locater.domain.EmployeeNames;
-import a3locater.tre.se.a3locater.util.Search;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
+
+import a3locater.tre.se.a3locater.domain.UserDetails;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,20 +57,18 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
     private View headerView;
     private NfcAdapter mNfcAdapter;
-    private EditText searchText;
-    private ImageButton searchBtn;
-    private String createUrl= "https://fastvedio.herokuapp.com/create/";
-    private String searchUrl = "https://fastvedio.herokuapp.com/search/";
-
-    private List<EmployeeNames> employeeNamesList;
+    private WebView webview;
+    private UserDetails userDetails;
+    private String createUrl= "https://taptocheckin.herokuapp.com/checkin/mylocation/";
+     private ImageView userImageNav;
     private String  responseStatus;
-    @Override
+
+     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent mIntent = getIntent();
-        intent = new Intent(getApplicationContext(), LoginActivity.class);
-        //searchText = (EditText) findViewById(R.id.searchText);
+
         floorTextView = findViewById(R.id.textViewFloor);
         areaTextView =  findViewById(R.id.textViewArea);
         deskTextView =   findViewById(R.id.textViewDesk);
@@ -73,12 +76,30 @@ public class MainActivity extends AppCompatActivity
         navigationView =  findViewById(R.id.nav_view);
         headerView = navigationView.getHeaderView(0);
 
+        userDetails = new UserDetails(
+                 mIntent.getSerializableExtra("empId").toString()
+                 , mIntent.getSerializableExtra("name").toString()
+                 , mIntent.getSerializableExtra("email").toString()
+                 , mIntent.getSerializableExtra("mobileNumber").toString()
+                 , mIntent.getSerializableExtra("role").toString()
+                 , mIntent.getSerializableExtra("team").toString()
+                 , mIntent.getSerializableExtra("profilePic").toString());
+
+         System.out.println("userDetails: " + userDetails.toString());
         userEmail =   headerView.findViewById(R.id.userEmail);
         userName =   headerView.findViewById(R.id.userName);
-        searchBtn =   findViewById(R.id.searchBtn);
-        userEmail.setText(""+mIntent.getSerializableExtra("Email"));
-        userName.setText(""+mIntent.getSerializableExtra("name"));
-        searchText = findViewById(R.id.searchText);
+        userImageNav = headerView.findViewById(R.id.userImageNav);
+        userEmail.setText(mIntent.getSerializableExtra("email").toString());
+        userName.setText(mIntent.getSerializableExtra("name").toString());
+        Picasso.with(getBaseContext()).load(mIntent.getSerializableExtra("profilePic").toString()).into(userImageNav);
+         webview = findViewById(R.id.webView);
+
+         webview.setWebViewClient(new WebViewClient());
+         webview.getSettings().setJavaScriptEnabled(true);
+         webview.getSettings().setDomStorageEnabled(true);
+         webview.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
+         webview.loadUrl("https://intranet.tre.se/");
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,46 +122,10 @@ public class MainActivity extends AppCompatActivity
         if (!mNfcAdapter.isEnabled()) {
             Toast.makeText(this, "NFC is disabled.", Toast.LENGTH_LONG).show();
         }
-        searchText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                searchText.setText(null);
-            }
-        });
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(null == searchText.getText().toString() ||searchText.getText().toString().isEmpty() ){
-                    searchText.setText("Nothing to search for..");
-                }else {
-                    AsyncTask<String, String, EmployeeNames> execute = new Search(searchUrl , searchText.getText().toString()).execute();
-                    try {
-                        System.out.println(execute.get());
-                        setEmployeesNames(execute.get());
 
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
     }
 
-    private void setEmployeesNames(EmployeeNames employeeNames) {
-        LinearLayout layout = findViewById(R.id.searchList);
 
-
-        TextView dynamicTextView = new TextView(this);
-        dynamicTextView.setTextSize(20);
-        dynamicTextView.setPadding(20, 300, 20, 100);
-        dynamicTextView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        dynamicTextView.setText(employeeNames.getEmpName() +" "+ employeeNames.getLocation() +" "+ employeeNames.getLocationImage());
-        layout.addView(dynamicTextView);
-
-            //this.setContentView(layout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-    }
 
     @Override
     public void onBackPressed() {
@@ -219,8 +204,15 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_profile) {
-            Intent intranetIntent = new Intent(getApplicationContext(), ProfileActivity.class);
-            startActivity(intranetIntent);
+            Intent profileActivity = new Intent(getApplicationContext(), ProfileActivity.class);
+            profileActivity.putExtra("id", userDetails.getEmpId());
+            profileActivity.putExtra("name", userDetails.getName());
+            profileActivity.putExtra("email", userDetails.getEmail());
+            profileActivity.putExtra("mobileNumber", userDetails.getMobileNumber());
+            profileActivity.putExtra("role", userDetails.getRole());
+            profileActivity.putExtra("team", userDetails.getTeam());
+            profileActivity.putExtra("profilePic", userDetails.getProfilePic());
+            startActivity(profileActivity);
         } else if (id == R.id.nav_intranet) {
             Intent intranetIntent = new Intent(getApplicationContext(), IntranetActivity.class);
             startActivity(intranetIntent);
@@ -228,6 +220,7 @@ public class MainActivity extends AppCompatActivity
             Intent intranetIntent = new Intent(getApplicationContext(), SearchActivity.class);
             startActivity(intranetIntent);
         }else if (id == R.id.nav_logout){
+            intent = new Intent(getApplicationContext(), LoginActivity.class);
             File dir = getFilesDir();
             File file = new File(dir, "mytextfile.txt");
             boolean deleted = file.delete();

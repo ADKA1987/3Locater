@@ -8,6 +8,22 @@
     tools:context="a3locater.tre.se.a3locater.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/AppTheme.PopupOverlay" />
+    <WebView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/webView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -44,19 +60,6 @@
             android:layout_height="wrap_content" />
 
     </LinearLayout>
-    <ScrollView
-        android:id="@+id/search_form"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/searchList"
-        android:layout_width="match_parent"
-        android:layout_height="375dp"
-        android:layout_gravity="center"
-        android:gravity="top|center"
-        android:orientation="vertical"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="83dp"></LinearLayout>
-    </ScrollView>
+
 </android.support.constraint.ConstraintLayout>

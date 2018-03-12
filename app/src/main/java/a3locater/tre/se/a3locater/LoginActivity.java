@@ -3,6 +3,7 @@ package a3locater.tre.se.a3locater;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import a3locater.tre.se.a3locater.domain.UserDetails;
 import a3locater.tre.se.a3locater.util.MySingleton;
 
 public class LoginActivity extends AppCompatActivity {
@@ -99,24 +101,48 @@ public class LoginActivity extends AppCompatActivity {
 
                             @Override
                             public void onResponse(JSONObject response) {
+                                UserDetails userDetails = null;
                                 if (null== response) {
-                                    Toast.makeText(getApplicationContext(), (CharSequence) "Incorrect Email.", Toast.LENGTH_SHORT).show();
-                                    System.out.println("Response: " + response.toString());
-                                }else{
-                                    intent = new Intent(getApplicationContext(), MainActivity.class);
+                                    Toast.makeText(getApplicationContext(),"Incorrect Email.", Toast.LENGTH_SHORT).show();
+                                    //System.out.println("Response: " + response.toString());
+                                }else {
                                     try {
-                                        intent.putExtra("Email", response.get("email").toString());
-                                        intent.putExtra("name", response.get("name").toString());
-                                        intent.putExtra("id", response.get("empId").toString());
-                                        StringBuffer buf = new StringBuffer ();
-                                        String data =  buf.append(intent.getSerializableExtra("Email")).append(",").append(intent.getSerializableExtra("name")).toString();
-                                        writeToFile(data);
+                                        userDetails = new UserDetails(
+                                                response.get("empId").toString()
+                                                , response.get("name").toString()
+                                                , response.get("email").toString()
+                                                , response.get("mobileNumber").toString()
+                                                , response.get("role").toString()
+                                                , response.get("team").toString()
+                                                , response.get("profilePic").toString());
+                                        System.out.println("userDetails: " + userDetails.toString());
+
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
+
+                                    StringBuffer buf = new StringBuffer();
+
+                                    String data = buf.append(userDetails.getEmpId()).append(",")
+                                            .append(userDetails.getName()).append(",")
+                                            .append(userDetails.getEmail()).append(",")
+                                            .append(userDetails.getMobileNumber()).append(",")
+                                            .append(userDetails.getRole()).append(",")
+                                            .append(userDetails.getTeam()).append(",")
+                                            .append(userDetails.getProfilePic())
+                                            .toString();
+                                    writeToFile(data);
+
+                                    intent = new Intent(getApplicationContext(), MainActivity.class);
+                                    intent.putExtra("empId", userDetails.getEmpId());
+                                    intent.putExtra("name", userDetails.getName());
+                                    intent.putExtra("email", userDetails.getEmail());
+                                    intent.putExtra("mobileNumber", userDetails.getMobileNumber());
+                                    intent.putExtra("role", userDetails.getRole());
+                                    intent.putExtra("team", userDetails.getTeam());
+                                    intent.putExtra("profilePic", userDetails.getProfilePic());
                                     startActivity(intent);
                                 }
-                                System.out.println("Response: " + response.toString());
                             }
                         }, new Response.ErrorListener() {
 
@@ -136,8 +162,9 @@ public class LoginActivity extends AppCompatActivity {
 
             //reading text from file
             try {
-                FileInputStream fileIn = openFileInput("mytextfile.txt");
-                InputStreamReader InputRead = new InputStreamReader(fileIn);
+                FileInputStream fileIn = openFileInput(Environment.getExternalStorageDirectory()+"/3Locator/mytextfile.txt");
+
+               InputStreamReader InputRead = new InputStreamReader(fileIn);
 
                 char[] inputBuffer = new char[READ_BLOCK_SIZE];
 
@@ -147,8 +174,8 @@ public class LoginActivity extends AppCompatActivity {
                     // char to string conversion
                     String readstring = String.copyValueOf(inputBuffer, 0, charRead);
                     String[] ar=readstring.split(",");
-                    email = ar[0].toString();
-                    name = ar[1].toString();
+                    name = ar[0].toString();
+                    email  = ar[1].toString();
                     userInfo += readstring;
 
                 }
@@ -162,7 +189,7 @@ public class LoginActivity extends AppCompatActivity {
     }
     private void writeToFile(String data) {
         try {
-            FileOutputStream fileout =openFileOutput("mytextfile.txt", MODE_PRIVATE);
+            FileOutputStream fileout =openFileOutput(Environment.getExternalStorageDirectory()+"/3Locator/mytextfile.txt", MODE_PRIVATE);
             OutputStreamWriter outputWriter=new OutputStreamWriter(fileout);
             outputWriter.write(data);
             outputWriter.close();

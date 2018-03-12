@@ -6,43 +6,7 @@
     android:layout_height="match_parent"
     tools:context="a3locater.tre.se.a3locater.MainActivity">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="top|center"
-            android:orientation="horizontal"
-            tools:layout_editor_absoluteY="25dp"
-            tools:ignore="MissingConstraints">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="wrap_content"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-            <EditText
-                android:id="@+id/searchText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:inputType="textPersonName" />
-
-            <ImageButton
-                android:id="@+id/searchBtn"
-                android:layout_width="9dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:visibility="visible"
-                app:srcCompat="@drawable/search16x16" />
-        </LinearLayout>
-    </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main" />
 
