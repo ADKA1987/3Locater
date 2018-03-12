@@ -93,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }else {
                 RequestQueue queue  = Volley.newRequestQueue(this);
-                String url = "https://fastvedio.herokuapp.com/read/"+email+".";
+                String url = "https://taptocheckin.herokuapp.com/checkin/getUserDetails?email="+email;
                 JsonObjectRequest jsObjRequest = new JsonObjectRequest
                         (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
                                     try {
                                         intent.putExtra("Email", response.get("email").toString());
                                         intent.putExtra("name", response.get("name").toString());
-                                        intent.putExtra("id", response.get("id").toString());
+                                        intent.putExtra("id", response.get("empId").toString());
                                         StringBuffer buf = new StringBuffer ();
                                         String data =  buf.append(intent.getSerializableExtra("Email")).append(",").append(intent.getSerializableExtra("name")).toString();
                                         writeToFile(data);
