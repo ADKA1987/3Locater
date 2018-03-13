@@ -25,10 +25,12 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".IntranetActivity" />
-        <activity android:name=".SearchActivity" />
-        <activity android:name=".ProfileActivity">
-        </activity>
+        <activity android:name=".IntranetActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".SearchActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".ProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
