@@ -2,8 +2,12 @@ package a3locater.tre.se.a3locater;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -15,6 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -32,11 +37,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.HttpResponse;
 import com.squareup.picasso.Picasso;
 
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.JSONObject;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
@@ -47,7 +56,7 @@ import a3locater.tre.se.a3locater.domain.UserDetails;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+    private Context mContext;
     public static final String MIME_TEXT_PLAIN = "text/plain";
     private boolean doubleBackToExitPressedOnce = false;
     public static final String TAG = "NfcDemo";
@@ -75,7 +84,7 @@ public class MainActivity extends AppCompatActivity
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         navigationView =  findViewById(R.id.nav_view);
         headerView = navigationView.getHeaderView(0);
-
+         mContext = this.getApplication();
         userDetails = new UserDetails(
                  mIntent.getSerializableExtra("empId").toString()
                  , mIntent.getSerializableExtra("name").toString()
@@ -84,21 +93,17 @@ public class MainActivity extends AppCompatActivity
                  , mIntent.getSerializableExtra("role").toString()
                  , mIntent.getSerializableExtra("team").toString()
                  , mIntent.getSerializableExtra("profilePic").toString());
-
-         System.out.println("userDetails: " + userDetails.toString());
         userEmail =   headerView.findViewById(R.id.userEmail);
         userName =   headerView.findViewById(R.id.userName);
         userImageNav = headerView.findViewById(R.id.userImageNav);
         userEmail.setText(mIntent.getSerializableExtra("email").toString());
         userName.setText(mIntent.getSerializableExtra("name").toString());
-        Picasso.with(getBaseContext()).load(mIntent.getSerializableExtra("profilePic").toString()).into(userImageNav);
-         webview = findViewById(R.id.webView);
 
-         webview.setWebViewClient(new WebViewClient());
-         webview.getSettings().setJavaScriptEnabled(true);
-         webview.getSettings().setDomStorageEnabled(true);
-         webview.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
-         webview.loadUrl("https://intranet.tre.se/");
+         //byte[] decodedString = Base64.decode(mIntent.getSerializableExtra("profilePic").toString(), Base64.DEFAULT);
+         //Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+         //Drawable verticalImage = new BitmapDrawable(getResources(),decodedByte );
+         //userImageNav.setImageDrawable(verticalImage);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -110,8 +115,8 @@ public class MainActivity extends AppCompatActivity
         });
 
         DrawerLayout drawer =   findViewById(R.id.drawer_layout);
-        NavigationView navigationView =  findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+         NavigationView navigationView =  findViewById(R.id.nav_view);
+         navigationView.setNavigationItemSelectedListener(this);
         if (mNfcAdapter == null) {
             // Stop here, we definitely need NFC
             Toast.makeText(this, "This device doesn't support NFC.", Toast.LENGTH_LONG).show();
@@ -124,8 +129,6 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
-
-
 
     @Override
     public void onBackPressed() {
@@ -221,9 +224,9 @@ public class MainActivity extends AppCompatActivity
             startActivity(intranetIntent);
         }else if (id == R.id.nav_logout){
             intent = new Intent(getApplicationContext(), LoginActivity.class);
-            File dir = getFilesDir();
-            File file = new File(dir, "mytextfile.txt");
-            boolean deleted = file.delete();
+            File file = new File(this.getFilesDir(),"3Locator");
+            File gpxfile = new File(file, "mytextfile.txt");
+            gpxfile.delete();
             startActivity(intent);
         }
 
@@ -349,16 +352,10 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
              String floor = String.valueOf(result).substring(1, 3);
              String area = String.valueOf(result).substring(4, 6);
              String desk = String.valueOf(result).substring(7, 9);
-             floorTextView.setText("Floor: " + floor);
-             areaTextView.setText(", Area: " + area);
-             deskTextView.setText(", Desk: " + desk);
-             String status = sendPost(result);
-
-             if(String.valueOf(status) == String.valueOf(200)){
-                 deskTextView.setText("Desk: Success" );
-             }else{
-                 deskTextView.setText("Desk: Faild" );
-             }
+             //floorTextView.setText("Floor: " + floor);
+             //areaTextView.setText(", Area: " + area);
+             //deskTextView.setText(", Desk: " + desk);
+             sendPost(result);
          }
     }
     }
@@ -374,35 +371,32 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
                     URL regUrl = new URL(createUrl);
                     HttpURLConnection conn = (HttpURLConnection) regUrl.openConnection();
                     conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+                    conn.setRequestProperty("Content-Type", "application/json");
                     conn.setRequestProperty("Accept","application/json");
                     conn.setDoOutput(true);
-                                       conn.setDoInput(true);
+                    conn.setDoInput(true);
 
                     JSONObject jsonParam = new JSONObject();
-                    jsonParam.put("empEmail", userEmail.getText());
-                    jsonParam.put("location", location);
-                  //  jsonParam.put("Area", area);
-                   // jsonParam.put("Location", desk);
-
+                    jsonParam.put("empId", userDetails.getEmpId());
+                    jsonParam.put("locationId", location);
                     Log.i("JSON", jsonParam.toString());
-                    DataOutputStream os = new DataOutputStream(conn.getOutputStream());
-                    os.writeBytes(URLEncoder.encode(jsonParam.toString(), "UTF-8"));
-                    os.writeBytes(jsonParam.toString());
+                    OutputStreamWriter os = new OutputStreamWriter (conn.getOutputStream());
+                    os.write(jsonParam.toString());
                     os.flush();
                     os.close();
                     responseStatus = String.valueOf(conn.getResponseCode());
+
                     Log.i("STATUS", String.valueOf(conn.getResponseCode()));
                     Log.i("MSG" , conn.getResponseMessage());
                     conn.disconnect();
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
 
-        thread.start();
-
+      //  thread.start();
         return responseStatus;
     }
 }
