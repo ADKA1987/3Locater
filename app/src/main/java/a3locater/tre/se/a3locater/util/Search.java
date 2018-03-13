@@ -96,6 +96,7 @@ public class Search extends AsyncTask<String, String, EmployeeNames> {
             regUrl = new URL(url+userName);
             urlConnection = (HttpURLConnection) regUrl.openConnection();
             urlConnection.setRequestMethod("GET");
+            Log.v("UrlConnection",  urlConnection.getContent().toString());
             int responseCode = urlConnection.getResponseCode();
             String responseMessage = urlConnection.getResponseMessage();
             if(responseCode == HttpURLConnection.HTTP_OK){
@@ -123,7 +124,7 @@ public class Search extends AsyncTask<String, String, EmployeeNames> {
 
             JSONObject jObj = new JSONObject(responseString);
             String name = jObj.getString("name");
-            String location = jObj.getString("location");
+            String location = jObj.getString("locationId");
             // String isbn = items.getJSONObject(i).getJSONObject("volumeInfo").getJSONArray("industryIdentifiers").getJSONObject(1).getString("identifier");
             //the value of progress is a placeholder here....
             employeeName = new EmployeeNames(name, location, null);
