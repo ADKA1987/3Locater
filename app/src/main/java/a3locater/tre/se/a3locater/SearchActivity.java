@@ -17,7 +17,7 @@ import a3locater.tre.se.a3locater.util.Search;
 public class SearchActivity extends AppCompatActivity {
     private EditText searchText;
     private ImageButton searchBtn;
-    private String searchUrl = "https://taptocheckin.herokuapp.com/checkin/getUserLocation";
+    private String searchUrl = "https://taptocheckin.herokuapp.com/checkin/getUserLocation?name=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +37,10 @@ public class SearchActivity extends AppCompatActivity {
                 if(null == searchText.getText().toString() ||searchText.getText().toString().isEmpty() ){
                     searchText.setText("Nothing to search for..");
                 }else {
+                    System.out.println("Entry to get execute search");
                     AsyncTask<String, String, EmployeeNames> execute = new Search(searchUrl , searchText.getText().toString()).execute();
                     try {
-                        System.out.println(execute.get());
+                        System.out.println("Trying to get execute search");
                         setEmployeesNames(execute.get());
 
                     } catch (InterruptedException e) {
