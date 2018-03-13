@@ -1,8 +1,10 @@
 package a3locater.tre.se.a3locater;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
@@ -11,8 +13,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,7 +56,9 @@ public class LoginActivity extends AppCompatActivity {
     private boolean doubleBackToExitPressedOnce = false;
     static final int READ_BLOCK_SIZE = 500;
     private String userInfo = "";
+    AnimationDrawable rocketAnimation;
 
+    @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
         intent = new Intent(getApplicationContext(), MainActivity.class);
         alreadyLoggedIn();
 
-        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
+         Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

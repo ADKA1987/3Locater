@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -17,8 +18,12 @@ import android.nfc.tech.Ndef;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -29,26 +34,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.toolbox.HttpResponse;
-import com.squareup.picasso.Picasso;
-
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.json.JSONObject;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.net.URL;
 
@@ -56,6 +49,8 @@ import a3locater.tre.se.a3locater.domain.UserDetails;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private ActionBarDrawerToggle drawerToggle;
+    private DrawerLayout drawerLayout;
     private Context mContext;
     public static final String MIME_TEXT_PLAIN = "text/plain";
     private boolean doubleBackToExitPressedOnce = false;
@@ -71,16 +66,20 @@ public class MainActivity extends AppCompatActivity
     private String createUrl= "https://taptocheckin.herokuapp.com/checkin/mylocation/";
      private ImageView userImageNav;
     private String  responseStatus;
-
+    private DrawerLayout mDrawerLayout;
      @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent mIntent = getIntent();
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+         ActionBar actionbar = getSupportActionBar();
+         actionbar.setDisplayHomeAsUpEnabled(true);
+         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
-        floorTextView = findViewById(R.id.textViewFloor);
-        areaTextView =  findViewById(R.id.textViewArea);
-        deskTextView =   findViewById(R.id.textViewDesk);
+         mDrawerLayout = findViewById(R.id.drawer_layout);
+
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         navigationView =  findViewById(R.id.nav_view);
         headerView = navigationView.getHeaderView(0);
@@ -99,11 +98,11 @@ public class MainActivity extends AppCompatActivity
         userEmail.setText(mIntent.getSerializableExtra("email").toString());
         userName.setText(mIntent.getSerializableExtra("name").toString());
 
-         //byte[] decodedString = Base64.decode(mIntent.getSerializableExtra("profilePic").toString(), Base64.DEFAULT);
-         //Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+         byte[] decodedString = Base64.decode(mIntent.getSerializableExtra("profilePic").toString(), Base64.DEFAULT);
+         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
-         //Drawable verticalImage = new BitmapDrawable(getResources(),decodedByte );
-         //userImageNav.setImageDrawable(verticalImage);
+         Drawable verticalImage = new BitmapDrawable(getResources(),decodedByte );
+         userImageNav.setImageDrawable(verticalImage);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +114,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         DrawerLayout drawer =   findViewById(R.id.drawer_layout);
+
          NavigationView navigationView =  findViewById(R.id.nav_view);
          navigationView.setNavigationItemSelectedListener(this);
         if (mNfcAdapter == null) {
@@ -128,6 +128,12 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "NFC is disabled.", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -191,7 +197,13 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        if(drawerToggle.onOptionsItemSelected(item))
+            return true;
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
