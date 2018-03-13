@@ -1,8 +1,13 @@
 package a3locater.tre.se.a3locater;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,7 +35,12 @@ public class ProfileActivity extends AppCompatActivity {
         userNumber.setText(mIntent.getSerializableExtra("mobileNumber").toString());
         userRole.setText(mIntent.getSerializableExtra("role").toString());
         userTeam.setText(mIntent.getSerializableExtra("team").toString());
-        Picasso.with(getBaseContext()).load(mIntent.getSerializableExtra("profilePic").toString()).into(userImage);
+
+        byte[] decodedString = Base64.decode(mIntent.getSerializableExtra("profilePic").toString(), Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+        Drawable verticalImage = new BitmapDrawable(getResources(),decodedByte );
+        userImage.setImageDrawable(verticalImage);
 
     }
 }

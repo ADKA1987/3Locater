@@ -3,6 +3,7 @@ package a3locater.tre.se.a3locater;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -25,12 +26,17 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import a3locater.tre.se.a3locater.domain.UserDetails;
 import a3locater.tre.se.a3locater.util.MySingleton;
@@ -41,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private Intent intent;
     private String email;
-    private String name,id;
+    private String name,id,mobileNumber,role,team,profilePic;
     private boolean doubleBackToExitPressedOnce = false;
     static final int READ_BLOCK_SIZE = 500;
     private String userInfo = "";
@@ -50,17 +56,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        boolean fileStatus = alreadyLoggedIn();
-        intent = new Intent(getApplicationContext(), MainActivity.class);
-        if (fileStatus) {
 
-            intent.putExtra("Email", email);
-            intent.putExtra("name", name);
-            intent.putExtra("id", "id");
-            startActivity(intent);
-        }
+        intent = new Intent(getApplicationContext(), MainActivity.class);
         mEmailView = findViewById(R.id.email);
         mLoginError =  findViewById(R.id.loginError);
+        intent = new Intent(getApplicationContext(), MainActivity.class);
+        alreadyLoggedIn();
 
         Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
@@ -70,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-        //checkUserLogin();
+
     }
     @Override
     public void onBackPressed() {
@@ -123,13 +124,13 @@ public class LoginActivity extends AppCompatActivity {
 
                                     StringBuffer buf = new StringBuffer();
 
-                                    String data = buf.append(userDetails.getEmpId()).append(",")
-                                            .append(userDetails.getName()).append(",")
-                                            .append(userDetails.getEmail()).append(",")
-                                            .append(userDetails.getMobileNumber()).append(",")
-                                            .append(userDetails.getRole()).append(",")
-                                            .append(userDetails.getTeam()).append(",")
-                                            .append(userDetails.getProfilePic())
+                                    String data = buf.append("EmpId;"+userDetails.getEmpId()).append('\n')
+                                            .append("Name;"+userDetails.getName()).append('\n')
+                                            .append("Email;"+userDetails.getEmail()).append('\n')
+                                            .append("MobileNumber;"+userDetails.getMobileNumber()).append('\n')
+                                            .append("Role;"+userDetails.getRole()).append('\n')
+                                            .append("Team;"+userDetails.getTeam()).append('\n')
+                                            .append("ProfilePic;"+userDetails.getProfilePic())
                                             .toString();
                                     writeToFile(data);
 
@@ -157,42 +158,62 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private boolean alreadyLoggedIn() {
-        boolean fileStatus = false;
+    private void alreadyLoggedIn() {
 
+        BufferedReader br = null;
+        FileReader fr = null;
+        File file = new File(this.getFilesDir(),"3Locator");
+        File gpxfile = new File(file, "mytextfile.txt");
+        //String fileName = "mytextfile.txt";
             //reading text from file
             try {
-                FileInputStream fileIn = openFileInput(Environment.getExternalStorageDirectory()+"/3Locator/mytextfile.txt");
-
-               InputStreamReader InputRead = new InputStreamReader(fileIn);
-
-                char[] inputBuffer = new char[READ_BLOCK_SIZE];
-
-                int charRead;
-
-                while ((charRead = InputRead.read(inputBuffer)) > 0) {
-                    // char to string conversion
-                    String readstring = String.copyValueOf(inputBuffer, 0, charRead);
-                    String[] ar=readstring.split(",");
-                    name = ar[0].toString();
-                    email  = ar[1].toString();
-                    userInfo += readstring;
+                fr = new FileReader(gpxfile);
+                br = new BufferedReader(fr);
+                String sCurrentLine;
+                StringBuilder details = new StringBuilder();
+                Map<String,String> map = new HashMap<>();
+                while ((sCurrentLine = br.readLine()) != null) {
+                    System.out.println(sCurrentLine);
+                    String [] ar = sCurrentLine.split(";");
+                    map.put(ar[0],ar[1]);
 
                 }
-                InputRead.close();
-                fileStatus = true;
+                id =map.get("EmpId");
+                name = map.get("Name");
+                email = map.get("Email");
+                mobileNumber =  map.get("MobileNumber");
+                role =  map.get("Role");
+                team =   map.get("Team");
+                profilePic =   map.get("ProfilePic");
+
+                intent.putExtra("empId",id);
+                intent.putExtra("name",name);
+                intent.putExtra("email",email);
+                intent.putExtra("mobileNumber",mobileNumber);
+                intent.putExtra("role",role);
+                intent.putExtra("team",team);
+                intent.putExtra("profilePic",profilePic);
+
+                startActivity(intent);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-        return fileStatus;
     }
     private void writeToFile(String data) {
+
+        File file = new File(this.getFilesDir(),"3Locator");
+
+        if(!file.exists()){
+            file.mkdir();
+        }
+
         try {
-            FileOutputStream fileout =openFileOutput(Environment.getExternalStorageDirectory()+"/3Locator/mytextfile.txt", MODE_PRIVATE);
-            OutputStreamWriter outputWriter=new OutputStreamWriter(fileout);
-            outputWriter.write(data);
-            outputWriter.close();
+            File gpxfile = new File(file, "mytextfile.txt");
+            FileWriter writer = new FileWriter(gpxfile);
+            writer.append(data);
+            writer.flush();
+            writer.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
