@@ -29,6 +29,7 @@ public class SearchActivity extends AppCompatActivity {
     private ImageButton searchBtn;
     private String searchUrl = "https://taptocheckin.herokuapp.com/checkin/getUserLocation?name=";
     private Context mContext;
+    private LinearLayout layout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +38,7 @@ public class SearchActivity extends AppCompatActivity {
         searchBtn =   findViewById(R.id.searchBtn);
         searchText = findViewById(R.id.searchText);
         searchText.setHint("Enter name");
+        layout = findViewById(R.id.searchList);
         searchText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,6 +60,7 @@ public class SearchActivity extends AppCompatActivity {
                         if(null == execute.get()){
                             Toast.makeText(mContext,"Cannot find the employee.",Toast.LENGTH_LONG).show();
                         }else{
+                            layout.removeAllViews();
                             setEmployeeLocation(execute.get());
                         }
                     } catch (InterruptedException e) {
@@ -70,12 +73,13 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
     private void setEmployeeLocation(EmployeeLocation employeeLocation) {
-        LinearLayout layout = findViewById(R.id.searchList);
+
 
 
 
         byte[] decodedString = Base64.decode(employeeLocation.getLocationImage(), Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        Bitmap.createScaledBitmap(decodedByte,200,200,true);
         Drawable verticalImage = new BitmapDrawable(getResources(),decodedByte );
 
         TextView dynamicTextView = new TextView(this);
@@ -85,6 +89,8 @@ public class SearchActivity extends AppCompatActivity {
         dynamicTextView.setText(employeeLocation.getEmpName());
 
         ImageView dynamicImageView = new ImageView(this);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(1200, 1200);
+        dynamicImageView.setLayoutParams(layoutParams);
         dynamicImageView.setImageDrawable(verticalImage);
 
         TextView dynamicTextViewLocation = new TextView(this);
