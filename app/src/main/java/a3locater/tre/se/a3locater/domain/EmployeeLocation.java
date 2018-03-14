@@ -4,12 +4,12 @@ package a3locater.tre.se.a3locater.domain;
  * Created by LENOVO on 3/10/2018.
  */
 
-public class EmployeeNames {
+public class EmployeeLocation {
     private String empName;
     private String location;
     private String locationImage;
 
-    public EmployeeNames(String empName, String location, String locationImage) {
+    public EmployeeLocation(String empName, String location, String locationImage) {
         this.empName = empName;
         this.location = location;
         this.locationImage = locationImage;
@@ -29,7 +29,7 @@ public class EmployeeNames {
 
     @Override
     public String toString() {
-        return "EmployeeNames{" +
+        return "EmployeeLocation{" +
                 "empName='" + empName + '\'' +
                 ", location='" + location + '\'' +
                 ", locationImage='" + locationImage + '\'' +

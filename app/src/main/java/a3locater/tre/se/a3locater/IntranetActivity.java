@@ -1,7 +1,10 @@
 package a3locater.tre.se.a3locater;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -9,8 +12,20 @@ public class IntranetActivity extends AppCompatActivity {
     private WebView webView;
    @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_intranet);
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_intranet);
+
+       Toolbar toolbar = findViewById(R.id.intranetToolbar);
+       setSupportActionBar(toolbar);
+       ActionBar actionbar = getSupportActionBar();
+       actionbar.setDisplayHomeAsUpEnabled(true);
+       actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back);
+       toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               finish();
+           }
+       });
 
        webView = findViewById(R.id.webView);
 

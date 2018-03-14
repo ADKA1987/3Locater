@@ -64,13 +64,14 @@ public class MainActivity extends AppCompatActivity
     private WebView webview;
     private UserDetails userDetails;
     private String createUrl= "https://taptocheckin.herokuapp.com/checkin/mylocation/";
-     private ImageView userImageNav;
-    private String  responseStatus;
+    private ImageView userImageNav;
+    private int responseStatus;
     private DrawerLayout mDrawerLayout;
      @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+         mContext = getApplicationContext();
         Intent mIntent = getIntent();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -322,6 +323,7 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
 
             if (ndefRecord.getTnf() == NdefRecord.TNF_WELL_KNOWN && Arrays.equals(ndefRecord.getType(), NdefRecord.RTD_TEXT)) {
                 try {
+
                     return readText(ndefRecord);
                 } catch (UnsupportedEncodingException e) {
                     Log.e(TAG, "Unsupported Encoding", e);
@@ -361,22 +363,16 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
     @Override
     protected void onPostExecute(String result) {
          if (result != null) {
-             String floor = String.valueOf(result).substring(1, 3);
-             String area = String.valueOf(result).substring(4, 6);
-             String desk = String.valueOf(result).substring(7, 9);
-             //floorTextView.setText("Floor: " + floor);
-             //areaTextView.setText(", Area: " + area);
-             //deskTextView.setText(", Desk: " + desk);
-             sendPost(result);
+          sendPost(result);
+         }else{
+             Toast.makeText(mContext,"Nothing to read from the nfc tag",Toast.LENGTH_LONG).show();
          }
     }
     }
 
-    public String sendPost(String result) {
-        final String location = result.toString();
+    public void sendPost(String result) {
+        final String location = result;
         Thread thread = new Thread(new Runnable() {
-
-
             @Override
             public void run() {
                 try {
@@ -396,8 +392,7 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
                     os.write(jsonParam.toString());
                     os.flush();
                     os.close();
-                    responseStatus = String.valueOf(conn.getResponseCode());
-
+                    setStatusCode(conn.getResponseCode());
                     Log.i("STATUS", String.valueOf(conn.getResponseCode()));
                     Log.i("MSG" , conn.getResponseMessage());
                     conn.disconnect();
@@ -408,7 +403,18 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
             }
         });
 
-      //  thread.start();
-        return responseStatus;
+        thread.start();
+        if (responseStatus == 200){
+            Toast.makeText(mContext,"Successfly regestered",Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(mContext,"Failed to regester",Toast.LENGTH_LONG).show();
+        }
+        System.out.println("responseStatus: "+responseStatus);
+
+
+    }
+    private void setStatusCode (int responseStatus){
+        this.responseStatus = responseStatus;
+
     }
 }
