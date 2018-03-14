@@ -4,9 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/tre_background"
     tools:context="a3locater.tre.se.a3locater.LoginActivity">
+   <!-- <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/tre_background"
+            android:scaleType = "centerCrop"/>
+    </FrameLayout>-->
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -44,26 +52,7 @@
                     android:background="@android:color/holo_orange_dark"
                     android:text="Login/Register" />
             </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginTop="25dp"
-            android:orientation="vertical">
 
-        </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_marginTop="25dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/loginError"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-        </LinearLayout>
         </LinearLayout>
 
     </ScrollView>

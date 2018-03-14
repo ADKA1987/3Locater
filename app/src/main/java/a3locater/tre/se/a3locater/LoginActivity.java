@@ -49,7 +49,6 @@ import a3locater.tre.se.a3locater.util.MySingleton;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText mEmailView;
-    private TextView mLoginError;
     private ProgressDialog progressDialog;
     private Intent intent;
     private String email;
@@ -68,7 +67,8 @@ public class LoginActivity extends AppCompatActivity {
 
         intent = new Intent(getApplicationContext(), MainActivity.class);
         mEmailView = findViewById(R.id.email);
-        mLoginError =  findViewById(R.id.loginError);
+        mEmailView.setHint("Email");
+        getWindow().setBackgroundDrawableResource(R.drawable.tre_background);
         intent = new Intent(getApplicationContext(), MainActivity.class);
         alreadyLoggedIn();
 

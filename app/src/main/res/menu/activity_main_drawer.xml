@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
@@ -8,18 +9,39 @@
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_menu_camera"
             android:title="Profile" />
+        <item android:title="History"
+            android:id="@+id/nav_history"
+            android:icon="@drawable/ic_history"/>
         <item
             android:id="@+id/nav_intranet"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Intranet" />
         <item
             android:id="@+id/nav_search"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_search_black_24dp"
             android:title="Search" />
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_logout"
             android:title="Logout" />
     </group>
+    <item android:title="Follow Tre">
+        <menu>
+    <group android:checkableBehavior="all">
+        <item
+            android:id="@+id/nav_fb"
+            android:icon="@drawable/facebook"
+            tools:ignore="MenuTitle"/>
+        <item
+            android:id="@+id/nav_tw"
+            android:icon="@drawable/twitter"
+            tools:ignore="MenuTitle" />
+        <item
+            android:id="@+id/nav_insta"
+            android:icon="@drawable/instagram"
+            tools:ignore="MenuTitle" />
+    </group>
+        </menu>
+    </item>
 
 </menu>
