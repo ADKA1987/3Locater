@@ -1,9 +1,5 @@
 package a3locater.tre.se.a3locater.domain;
 
-/**
- * Created by LENOVO on 3/10/2018.
- */
-
 public class EmployeeLocation {
     private String empName;
     private String location;
