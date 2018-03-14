@@ -15,18 +15,6 @@ public class IntranetActivity extends AppCompatActivity {
        super.onCreate(savedInstanceState);
        setContentView(R.layout.activity_intranet);
 
-       Toolbar toolbar = findViewById(R.id.intranetToolbar);
-       setSupportActionBar(toolbar);
-       ActionBar actionbar = getSupportActionBar();
-       actionbar.setDisplayHomeAsUpEnabled(true);
-       actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back);
-       toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View view) {
-               finish();
-           }
-       });
-
        webView = findViewById(R.id.webView);
 
        webView.setWebViewClient(new WebViewClient());
