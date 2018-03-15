@@ -24,6 +24,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -164,9 +165,10 @@ public class MainActivity extends AppCompatActivity
             if(null == locations){
                 Toast.makeText(mContext,"Cannot find any free Locations.",Toast.LENGTH_LONG).show();
             }else{
-                floorNumber.setText(locations.getFloors().toString());
-                areaNumber.setText(locations.getAreas().toString());
-                seatsNumber.setText(locations.getDesks().toString());
+                TextUtils.join(",",locations.getFloors());
+                floorNumber.setText(TextUtils.join(",",locations.getFloors()));
+                areaNumber.setText(TextUtils.join(",",locations.getAreas()));
+                seatsNumber.setText(TextUtils.join(",",locations.getDesks()));
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
