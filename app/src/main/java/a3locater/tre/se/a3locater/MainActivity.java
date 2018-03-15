@@ -113,7 +113,9 @@ public class MainActivity extends AppCompatActivity
         floorNumber = findViewById(R.id.floorNumber);
         areaNumber = findViewById(R.id.areaNumber);
         seatsNumber = findViewById(R.id.seatsNumber);
+
         getAvailableSeats();
+
         Menu navMenu = navigationView.getMenu();
         navMenu.findItem(R.id.nav_bookArea).setVisible(false);
 
@@ -165,17 +167,18 @@ public class MainActivity extends AppCompatActivity
             if(null == locations){
                 Toast.makeText(mContext,"Cannot find any free Locations.",Toast.LENGTH_LONG).show();
             }else{
-                TextUtils.join(",",locations.getFloors());
+
+                //TextUtils.join(",",locations.getFloors());
                 floorNumber.setText(TextUtils.join(",",locations.getFloors()));
-                areaNumber.setText(TextUtils.join(",",locations.getAreas()));
-                seatsNumber.setText(TextUtils.join(",",locations.getDesks()));
+                areaNumber.setText("01");
+                //areaNumber.setText(TextUtils.join(",",locations.getAreas()));
+                seatsNumber.setText(String.valueOf(locations.getDesks().size()));
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -428,12 +431,14 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
           if (responseStatus == 202){
               Snackbar.make(fab, "        Floor: "+ floor+ "         Arear: "+area+ "         Seat: "+ desk , Snackbar.LENGTH_LONG).setAction("Action", null).show();
               StringBuffer buf = new StringBuffer();
+
               String data = buf.append("floor;"+String.valueOf(result).substring(1,3)).append('\n')
                       .append("area;"+String.valueOf(result).substring(4,6)).append('\n')
                       .append("desk;"+String.valueOf(result).substring(7,10)).append('\n')
                       .toString();
 
               writeToFile(data);
+              getAvailableSeats();
                 Toast.makeText(mContext,"You are Checked-In. Have a nice day",Toast.LENGTH_LONG).show();
           }else if(responseStatus == 208){
               Snackbar.make(fab, "        Floor: "+ floor+ "         Arear: "+area+ "         Seat: "+ desk , Snackbar.LENGTH_LONG).setAction("Action", null).show();
