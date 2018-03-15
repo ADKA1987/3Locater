@@ -37,15 +37,22 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.util.Arrays;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 import a3locater.tre.se.a3locater.domain.UserDetails;
+import a3locater.tre.se.a3locater.util.SendMyLocation;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -65,13 +72,14 @@ public class MainActivity extends AppCompatActivity
     private UserDetails userDetails;
     private String createUrl= "https://taptocheckin.herokuapp.com/checkin/mylocation/";
     private ImageView userImageNav;
-    private int responseStatus;
+    private Integer responseStatus;
     private DrawerLayout mDrawerLayout;
      @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
          mContext = getApplicationContext();
+         deleteCache(mContext);
         Intent mIntent = getIntent();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -363,58 +371,51 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
     @Override
     protected void onPostExecute(String result) {
          if (result != null) {
-          sendPost(result);
+
+                 //sendPost(result);
+                 AsyncTask<String, Void, Integer> execute = new SendMyLocation(result,userDetails).execute();
+             try {
+                 responseStatus = execute.get();
+             } catch (InterruptedException e) {
+                 e.printStackTrace();
+             } catch (ExecutionException e) {
+                 e.printStackTrace();
+             }
+             System.out.println("onPostExecute, responseStatus:"+ responseStatus);
+          if (responseStatus == 202){
+                Toast.makeText(mContext,"Successfly regestered",Toast.LENGTH_LONG).show();
+          }else if(responseStatus == 208){
+               Toast.makeText(mContext,"Allready regestered",Toast.LENGTH_LONG).show();
+           }else if(responseStatus == 500){
+              Toast.makeText(mContext,"Failed to regester",Toast.LENGTH_LONG).show();
+           }
          }else{
              Toast.makeText(mContext,"Nothing to read from the nfc tag",Toast.LENGTH_LONG).show();
          }
     }
     }
+    
+    public static void deleteCache(Context context) {
+        try {
+            File dir = context.getCacheDir();
+            deleteDir(dir);
+        } catch (Exception e) {}
+    }
 
-    public void sendPost(String result) {
-        final String location = result;
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL regUrl = new URL(createUrl);
-                    HttpURLConnection conn = (HttpURLConnection) regUrl.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setRequestProperty("Accept","application/json");
-                    conn.setDoOutput(true);
-                    conn.setDoInput(true);
-
-                    JSONObject jsonParam = new JSONObject();
-                    jsonParam.put("empId", userDetails.getEmpId());
-                    jsonParam.put("locationId", location);
-                    Log.i("JSON", jsonParam.toString());
-                    OutputStreamWriter os = new OutputStreamWriter (conn.getOutputStream());
-                    os.write(jsonParam.toString());
-                    os.flush();
-                    os.close();
-                    setStatusCode(conn.getResponseCode());
-                    Log.i("STATUS", String.valueOf(conn.getResponseCode()));
-                    Log.i("MSG" , conn.getResponseMessage());
-                    conn.disconnect();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
                 }
             }
-        });
-
-        thread.start();
-        if (responseStatus == 200){
-            Toast.makeText(mContext,"Successfly regestered",Toast.LENGTH_LONG).show();
-        }else{
-            Toast.makeText(mContext,"Failed to regester",Toast.LENGTH_LONG).show();
+            return dir.delete();
+        } else if(dir!= null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
         }
-        System.out.println("responseStatus: "+responseStatus);
-
-
-    }
-    private void setStatusCode (int responseStatus){
-        this.responseStatus = responseStatus;
-
     }
 }
