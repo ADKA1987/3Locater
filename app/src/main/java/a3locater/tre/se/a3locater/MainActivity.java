@@ -62,14 +62,14 @@ public class MainActivity extends AppCompatActivity
     private boolean doubleBackToExitPressedOnce = false;
     public static final String TAG = "NfcDemo";
     private String floor, area, desk;
-    private TextView userEmail,userName;
+    private TextView userEmail,userName,floorNumber,areaNumber,seatsNumber;
     private Intent intent;
     private NavigationView navigationView;
     private View headerView;
     private NfcAdapter mNfcAdapter;
     private WebView webview;
     private UserDetails userDetails;
-    private String createUrl= "https://taptocheckin.herokuapp.com/checkin/mylocation/";
+    private String getSeatsUrl = "https://taptocheckin.herokuapp.com/checkin/getFreeLocations";
     private ImageView userImageNav;
     private Integer responseStatus;
     private DrawerLayout mDrawerLayout;
@@ -107,8 +107,12 @@ public class MainActivity extends AppCompatActivity
         userEmail.setText(mIntent.getSerializableExtra("email").toString());
         userName.setText(mIntent.getSerializableExtra("name").toString());
 
+        floorNumber = findViewById(R.id.floorNumber);
+        areaNumber = findViewById(R.id.areaNumber);
+        seatsNumber = findViewById(R.id.seatsNumber);
+        getAvailableSeats();
         Menu navMenu = navigationView.getMenu();
-         navMenu.findItem(R.id.nav_bookArea).setVisible(false);
+        navMenu.findItem(R.id.nav_bookArea).setVisible(false);
 
 
             if (userDetails.getRole().equals("Manager")){
@@ -147,6 +151,10 @@ public class MainActivity extends AppCompatActivity
         if (!mNfcAdapter.isEnabled()) {
             Toast.makeText(this, "NFC is disabled.", Toast.LENGTH_LONG).show();
         }
+
+    }
+
+    private void getAvailableSeats() {
 
     }
 

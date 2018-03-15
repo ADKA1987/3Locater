@@ -38,6 +38,7 @@
             android:textColor="@android:color/secondary_text_light"
             android:textSize="20dp" />
         <TextView
+            android:id="@+id/floorNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Floor Number"
@@ -54,6 +55,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <TextView
+            android:id="@+id/areaNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Area Number"
@@ -65,6 +67,7 @@
             android:background="@mipmap/ic_blue_circle_256"/>
 
         <TextView
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="70dp"
@@ -93,6 +96,7 @@
             android:textColor="@android:color/secondary_text_light"
             android:textSize="30dp"/>
         <TextView
+            android:id="@+id/seatsNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Desks Number"
