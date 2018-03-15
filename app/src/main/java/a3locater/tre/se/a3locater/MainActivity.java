@@ -3,6 +3,7 @@ package a3locater.tre.se.a3locater;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -23,6 +24,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -36,6 +38,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -48,6 +51,7 @@ import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -66,6 +70,7 @@ public class MainActivity extends AppCompatActivity
     public static final String TAG = "NfcDemo";
     private String floor, area, desk;
     private TextView userEmail,userName,floorNumber,areaNumber,seatsNumber;
+
     private Intent intent;
     private NavigationView navigationView;
     private View headerView;
@@ -113,6 +118,7 @@ public class MainActivity extends AppCompatActivity
         floorNumber = findViewById(R.id.floorNumber);
         areaNumber = findViewById(R.id.areaNumber);
         seatsNumber = findViewById(R.id.seatsNumber);
+
 
         getAvailableSeats();
 
@@ -173,6 +179,13 @@ public class MainActivity extends AppCompatActivity
                 areaNumber.setText("01");
                 //areaNumber.setText(TextUtils.join(",",locations.getAreas()));
                 seatsNumber.setText(String.valueOf(locations.getDesks().size()));
+                final List<String> availableSeats = locations.getDesks();
+                seatsNumber.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        seatsList(availableSeats);
+                            }
+                });
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -521,5 +534,40 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    private void seatsList(List<String> seatsArray) {
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(MainActivity.this);
+        builderSingle.setIcon(R.drawable.ic_seat);
+        builderSingle.setTitle("Available Seats");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
+        for(String seat: seatsArray){
+            arrayAdapter.add(seat);
+        }
+
+        builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String strName = arrayAdapter.getItem(which);
+              AlertDialog.Builder builderInner = new AlertDialog.Builder(MainActivity.this);
+             //builderInner.setMessage(strName);
+             // builderInner.setTitle("Your Selected Item is");
+             // builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                //   @Override
+               //     public void onClick(DialogInterface dialog,int which) {
+               //        dialog.dismiss();
+                //   }
+              // });
+               builderInner.show();
+            }
+        });
+        builderSingle.show();
     }
 }
