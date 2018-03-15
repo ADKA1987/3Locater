@@ -11,14 +11,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import a3locater.tre.se.a3locater.domain.EmployeeLocation;
@@ -34,6 +39,8 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        ArrayList<String> floorsList= getIntent().getStringArrayListExtra("floors");
+        ArrayList<String> areaList = getIntent().getStringArrayListExtra("areas");
         mContext = getApplicationContext();
         searchBtn =   findViewById(R.id.searchBtn);
         searchText = findViewById(R.id.searchText);
@@ -69,6 +76,58 @@ public class SearchActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+            }
+        });
+
+        Spinner dynamicSpinner = findViewById(R.id.floor_spinner);
+        ArrayList<String> items = new ArrayList<>();
+        for (String floor : floorsList){
+            items.add(floor);
+        }
+         //= new String[] { "Chai Latte", "Green Tea", "Black Tea" };
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext,
+
+                android.R.layout.simple_spinner_item, items);
+
+        dynamicSpinner.setAdapter(adapter);
+
+        dynamicSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                Log.v("item", (String) parent.getItemAtPosition(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        Spinner areaSpinner = findViewById(R.id.area_spinner);
+        ArrayList<String> areaitems = new ArrayList<>();
+        for (String area : areaList){
+            areaitems.add(area);
+        }
+        //= new String[] { "Chai Latte", "Green Tea", "Black Tea" };
+
+        ArrayAdapter<String> areaadapter = new ArrayAdapter<String>(mContext,
+
+                android.R.layout.simple_spinner_item, areaitems);
+
+        areaSpinner.setAdapter(adapter);
+
+        areaSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                Log.v("item", (String) parent.getItemAtPosition(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
             }
         });
     }

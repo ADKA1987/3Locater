@@ -29,7 +29,7 @@
             android:icon="@drawable/ic_logout"
             android:title="Logout" />
     </group>
-    <item android:title="Follow Tre">
+    <!--<item android:title="Follow Tre">
         <menu>
     <group android:checkableBehavior="all">
         <item
@@ -46,6 +46,6 @@
             tools:ignore="MenuTitle" />
     </group>
         </menu>
-    </item>
+    </item>-->
 
 </menu>

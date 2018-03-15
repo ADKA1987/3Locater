@@ -11,5 +11,9 @@
     <string name="title_activity_book_area">BookAreaActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
-   <string name="avaialble_seats">Avaliable \n Seats</string>
+    <string name="avaialble_seats">Avaliable \n Seats</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="close_button">Close</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

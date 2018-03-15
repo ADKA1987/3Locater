@@ -1,6 +1,7 @@
 package a3locater.tre.se.a3locater;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,6 +31,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -37,6 +39,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -49,6 +52,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +86,8 @@ public class MainActivity extends AppCompatActivity
     private Integer responseStatus;
     private DrawerLayout mDrawerLayout;
     private FloatingActionButton fab;
+    private  Drawable verticalImage;
+    private Location locations;
      @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,7 +142,7 @@ public class MainActivity extends AppCompatActivity
          byte[] decodedString = Base64.decode(mIntent.getSerializableExtra("profilePic").toString(), Base64.DEFAULT);
          Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
-         Drawable verticalImage = new BitmapDrawable(getResources(),decodedByte );
+         verticalImage = new BitmapDrawable(getResources(),decodedByte );
          userImageNav.setImageDrawable(verticalImage);
 
         fab = findViewById(R.id.main_fab);
@@ -169,7 +175,7 @@ public class MainActivity extends AppCompatActivity
         String searchUrl = "https://taptocheckin.herokuapp.com/checkin/getFreeLocations";
         AsyncTask<String, String, Location> execute = new FreeLocations(searchUrl , "dummy").execute();
         try {
-            Location locations = execute.get();
+            locations = execute.get();
             if(null == locations){
                 Toast.makeText(mContext,"Cannot find any free Locations.",Toast.LENGTH_LONG).show();
             }else{
@@ -184,7 +190,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(View view) {
                         seatsList(availableSeats);
-                            }
+                        }
                 });
             }
         } catch (InterruptedException e) {
@@ -296,8 +302,11 @@ public class MainActivity extends AppCompatActivity
             Intent intranetIntent = new Intent(getApplicationContext(), IntranetActivity.class);
             startActivity(intranetIntent);
         }  else if (id == R.id.nav_search) {
-            Intent intranetIntent = new Intent(getApplicationContext(), SearchActivity.class);
-            startActivity(intranetIntent);
+            Intent searchIntent = new Intent(getApplicationContext(), SearchActivity.class);
+            searchIntent.putExtra("floors",(ArrayList<String>) locations.getFloors());
+            searchIntent.putExtra("areas",(ArrayList<String>) locations.getAreas());
+            //searchIntent.putExtra("floors",(ArrayList<String>) locations.getFloors());
+            startActivity(searchIntent);
         }else if (id == R.id.nav_logout){
             intent = new Intent(getApplicationContext(), LoginActivity.class);
             File file = new File(this.getFilesDir(),"3Locator");
@@ -555,19 +564,30 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
         builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String strName = arrayAdapter.getItem(which);
+              String strName = arrayAdapter.getItem(which);
               AlertDialog.Builder builderInner = new AlertDialog.Builder(MainActivity.this);
-             //builderInner.setMessage(strName);
-             // builderInner.setTitle("Your Selected Item is");
-             // builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                //   @Override
-               //     public void onClick(DialogInterface dialog,int which) {
-               //        dialog.dismiss();
-                //   }
-              // });
-               builderInner.show();
+              LayoutInflater factory = LayoutInflater.from(MainActivity.this);
+              final View view = factory.inflate(R.layout.available_seat_image, null);
+              view.setBackground(verticalImage);
+
+              builderInner.setMessage(strName);
+              //builderInner.setTitle("Your Selected Item is");
+                //Dialog alertDialog = builderInner.setView(view).create();
+
+
+                Dialog alertDialog = builderInner.setView(view).create();
+                alertDialog.show();
+                alertDialog.getWindow().setLayout(800, 1500);
+                builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,int which) {
+                        dialog.dismiss();
+                    }
+                });
             }
+
         });
+
         builderSingle.show();
     }
 }
