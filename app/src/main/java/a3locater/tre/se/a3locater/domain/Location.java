@@ -5,34 +5,34 @@ import java.util.Set;
 
 public class Location {
 
-    private Set<String> floors;
-    private Set<String> areas;
-    private Set<String> desks;
+    private List<String> floors;
+    private List<String> areas;
+    private List<String> desks;
 
     public Location() {
     }
 
-    public Set<String> getFloors() {
+    public List<String> getFloors() {
         return floors;
     }
 
-    public void setFloors(Set<String> floors) {
+    public void setFloors(List<String> floors) {
         this.floors = floors;
     }
 
-    public Set<String> getAreas() {
+    public List<String> getAreas() {
         return areas;
     }
 
-    public void setAreas(Set<String> areas) {
+    public void setAreas(List<String> areas) {
         this.areas = areas;
     }
 
-    public Set<String> getDesks() {
+    public List<String> getDesks() {
         return desks;
     }
 
-    public void setDesks(Set<String> desks) {
+    public void setDesks(List<String> desks) {
         this.desks = desks;
     }
 }

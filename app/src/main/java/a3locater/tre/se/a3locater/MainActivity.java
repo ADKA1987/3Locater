@@ -50,7 +50,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import a3locater.tre.se.a3locater.domain.Location;
 import a3locater.tre.se.a3locater.domain.UserDetails;
+import a3locater.tre.se.a3locater.util.FreeLocations;
 import a3locater.tre.se.a3locater.util.SendMyLocation;
 
 public class MainActivity extends AppCompatActivity
@@ -149,12 +151,28 @@ public class MainActivity extends AppCompatActivity
 
         }
         if (!mNfcAdapter.isEnabled()) {
-            Toast.makeText(this, "NFC is disabled.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Please enable NFC to Check-In", Toast.LENGTH_LONG).show();
         }
 
     }
 
     private void getAvailableSeats() {
+        String searchUrl = "https://taptocheckin.herokuapp.com/checkin/getFreeLocations";
+        AsyncTask<String, String, Location> execute = new FreeLocations(searchUrl , "dummy").execute();
+        try {
+            Location locations = execute.get();
+            if(null == locations){
+                Toast.makeText(mContext,"Cannot find any free Locations.",Toast.LENGTH_LONG).show();
+            }else{
+                floorNumber.setText(locations.getFloors().toString());
+                areaNumber.setText(locations.getAreas().toString());
+                seatsNumber.setText(locations.getDesks().toString());
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
     }
 

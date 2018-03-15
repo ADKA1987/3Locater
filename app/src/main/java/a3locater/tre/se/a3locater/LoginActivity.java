@@ -101,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
     private void checkUserLogin() {
              email = mEmailView.getText().toString().trim();
             if (TextUtils.isEmpty(email)) {
-                Toast.makeText(this, "Please enter email", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Please enter your Email", Toast.LENGTH_LONG).show();
                 return;
             }else {
                 RequestQueue queue  = Volley.newRequestQueue(this);

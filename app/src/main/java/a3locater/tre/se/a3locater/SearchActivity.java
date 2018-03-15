@@ -58,7 +58,7 @@ public class SearchActivity extends AppCompatActivity {
                     AsyncTask<String, String, EmployeeLocation> execute = new Search(searchUrl , searchText.getText().toString()).execute();
                     try {
                         if(null == execute.get()){
-                            Toast.makeText(mContext,"Cannot find the employee.",Toast.LENGTH_LONG).show();
+                            Toast.makeText(mContext,"Could not find the location for the given name.",Toast.LENGTH_LONG).show();
                         }else{
                             layout.removeAllViews();
                             setEmployeeLocation(execute.get());
