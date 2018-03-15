@@ -23,5 +23,97 @@
 
     </FrameLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="260dp"
+            android:layout_marginTop="100dp"
+            android:text="Floor"
+            android:textStyle="bold"
+            android:textColor="@android:color/secondary_text_light"
+            android:textSize="20dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Floor Number"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@android:color/secondary_text_light"
+            android:layout_marginLeft="200dp"
+            android:textSize="20dp"
+            android:background="@mipmap/ic_orange_circle_256"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Area Number"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@android:color/secondary_text_light"
+            android:layout_marginTop="300dp"
+            android:textSize="20dp"
+            android:background="@mipmap/ic_blue_circle_256"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="70dp"
+            android:text="Area"
+            android:textStyle="bold"
+            android:textColor="@android:color/secondary_text_light"
+            android:textSize="20dp" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Available"
+                android:textSize="40dp"
+                android:textStyle="bold"
+                android:textColor="@android:color/secondary_text_light"
+                android:layout_marginTop="100dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="   Seats"
+            android:textColor="@android:color/secondary_text_light"
+            android:textSize="30dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desks Number"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@android:color/secondary_text_light"
+            android:layout_marginTop="300dp"
+            android:layout_marginLeft="150dp"
+            android:textSize="20dp"
+            android:background="@mipmap/ic_pink_circle_256"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="210dp"
+            android:text="Seats"
+            android:textStyle="bold"
+            android:textColor="@android:color/secondary_text_light"
+            android:textSize="20dp" />
+    </LinearLayout>
+
+
 
 </android.support.constraint.ConstraintLayout>

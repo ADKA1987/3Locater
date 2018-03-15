@@ -18,7 +18,7 @@ import android.nfc.tech.Ndef;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PersistableBundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -26,6 +26,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -34,21 +35,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.util.Arrays;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import a3locater.tre.se.a3locater.domain.UserDetails;
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity
     public static final String MIME_TEXT_PLAIN = "text/plain";
     private boolean doubleBackToExitPressedOnce = false;
     public static final String TAG = "NfcDemo";
-    private TextView floorTextView, areaTextView,deskTextView;
+    private String floor, area, desk;
     private TextView userEmail,userName;
     private Intent intent;
     private NavigationView navigationView;
@@ -74,6 +73,7 @@ public class MainActivity extends AppCompatActivity
     private ImageView userImageNav;
     private Integer responseStatus;
     private DrawerLayout mDrawerLayout;
+    private FloatingActionButton fab;
      @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,18 +107,29 @@ public class MainActivity extends AppCompatActivity
         userEmail.setText(mIntent.getSerializableExtra("email").toString());
         userName.setText(mIntent.getSerializableExtra("name").toString());
 
+        Menu navMenu = navigationView.getMenu();
+         navMenu.findItem(R.id.nav_bookArea).setVisible(false);
+
+
+            if (userDetails.getRole().equals("Manager")){
+                navMenu.findItem(R.id.nav_bookArea).setVisible(true);
+
+            }else{
+                navMenu.findItem(R.id.nav_bookArea).setVisible(false);
+            }
+
          byte[] decodedString = Base64.decode(mIntent.getSerializableExtra("profilePic").toString(), Base64.DEFAULT);
          Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
          Drawable verticalImage = new BitmapDrawable(getResources(),decodedByte );
          userImageNav.setImageDrawable(verticalImage);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.main_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+               getMyLocationFromFile();
+               Snackbar.make(view, "        Floor: "+ floor+ "         Arear: "+area+ "         Seat: "+ desk , Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
 
@@ -249,6 +260,9 @@ public class MainActivity extends AppCompatActivity
             File gpxfile = new File(file, "mytextfile.txt");
             gpxfile.delete();
             startActivity(intent);
+        }else if (id == R.id.nav_bookArea){
+            intent = new Intent(getApplicationContext(),BookAreaActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -371,8 +385,9 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
     @Override
     protected void onPostExecute(String result) {
          if (result != null) {
-
-                 //sendPost(result);
+             floor = String.valueOf(result).substring(1,3);
+             area = String.valueOf(result).substring(4,6);
+             desk = String.valueOf(result).substring(7,10);
                  AsyncTask<String, Void, Integer> execute = new SendMyLocation(result,userDetails).execute();
              try {
                  responseStatus = execute.get();
@@ -383,18 +398,27 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
              }
              System.out.println("onPostExecute, responseStatus:"+ responseStatus);
           if (responseStatus == 202){
-                Toast.makeText(mContext,"Successfly regestered",Toast.LENGTH_LONG).show();
+              Snackbar.make(fab, "        Floor: "+ floor+ "         Arear: "+area+ "         Seat: "+ desk , Snackbar.LENGTH_LONG).setAction("Action", null).show();
+              StringBuffer buf = new StringBuffer();
+              String data = buf.append("floor;"+String.valueOf(result).substring(1,3)).append('\n')
+                      .append("area;"+String.valueOf(result).substring(4,6)).append('\n')
+                      .append("desk;"+String.valueOf(result).substring(7,10)).append('\n')
+                      .toString();
+
+              writeToFile(data);
+                Toast.makeText(mContext,"You are Checked-In. Have a nice day",Toast.LENGTH_LONG).show();
           }else if(responseStatus == 208){
-               Toast.makeText(mContext,"Allready regestered",Toast.LENGTH_LONG).show();
+              Snackbar.make(fab, "        Floor: "+ floor+ "         Arear: "+area+ "         Seat: "+ desk , Snackbar.LENGTH_LONG).setAction("Action", null).show();
+               Toast.makeText(mContext,"You are Already Checked-In for today",Toast.LENGTH_LONG).show();
            }else if(responseStatus == 500){
-              Toast.makeText(mContext,"Failed to regester",Toast.LENGTH_LONG).show();
+              Toast.makeText(mContext,"Could not Check-In. Try Again",Toast.LENGTH_LONG).show();
            }
          }else{
              Toast.makeText(mContext,"Nothing to read from the nfc tag",Toast.LENGTH_LONG).show();
          }
     }
     }
-    
+
     public static void deleteCache(Context context) {
         try {
             File dir = context.getCacheDir();
@@ -416,6 +440,53 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
             return dir.delete();
         } else {
             return false;
+        }
+    }
+
+
+    private void writeToFile(String data) {
+        File file = new File(this.getFilesDir(),"3Locator");
+
+        if(!file.exists()){
+            file.mkdir();
+        }
+
+        try {
+            File gpxfile = new File(file, "mylocation.txt");
+            FileWriter writer = new FileWriter(gpxfile);
+            writer.append(data);
+            writer.flush();
+            writer.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getMyLocationFromFile(){
+        BufferedReader br = null;
+        FileReader fr = null;
+        File file = new File(this.getFilesDir(),"3Locator");
+        File gpxfile = new File(file, "mylocation.txt");
+        try {
+            fr = new FileReader(gpxfile);
+            br = new BufferedReader(fr);
+            String sCurrentLine;
+            StringBuilder details = new StringBuilder();
+            Map<String,String> map = new HashMap<>();
+            while ((sCurrentLine = br.readLine()) != null) {
+                System.out.println(sCurrentLine);
+                String [] ar = sCurrentLine.split(";");
+                map.put(ar[0],ar[1]);
+
+            }
+
+            floor =map.get("floor");
+            area = map.get("area");
+            desk = map.get("desk");
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

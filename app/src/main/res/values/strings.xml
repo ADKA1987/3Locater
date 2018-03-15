@@ -8,4 +8,8 @@
 
     <string name="action_settings">Settings</string>
     <string name="successRegisteration">This device doesn\'t support NFC.</string>
+    <string name="title_activity_book_area">BookAreaActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_scrolling">ScrollingActivity</string>
+   <string name="avaialble_seats">Avaliable \n Seats</string>
 </resources>
