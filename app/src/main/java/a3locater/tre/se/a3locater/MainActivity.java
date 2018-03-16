@@ -57,6 +57,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import a3locater.tre.se.a3locater.domain.Location;
@@ -139,12 +140,6 @@ public class MainActivity extends AppCompatActivity
                 navMenu.findItem(R.id.nav_bookArea).setVisible(false);
             }
 
-         byte[] decodedString = Base64.decode(mIntent.getSerializableExtra("profilePic").toString(), Base64.DEFAULT);
-         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-         verticalImage = new BitmapDrawable(getResources(),decodedByte );
-         userImageNav.setImageDrawable(verticalImage);
-
         fab = findViewById(R.id.main_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,6 +180,14 @@ public class MainActivity extends AppCompatActivity
                 areaNumber.setText("01");
                 //areaNumber.setText(TextUtils.join(",",locations.getAreas()));
                 seatsNumber.setText(String.valueOf(locations.getDesks().size()));
+                Random randImage = new Random();
+
+                byte[] decodedString = Base64.decode(locations.getFloorPlans().get(randImage.nextInt(1)+4), Base64.DEFAULT);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+                verticalImage = new BitmapDrawable(getResources(),decodedByte );
+                userImageNav.setImageDrawable(verticalImage);
+
                 final List<String> availableSeats = locations.getDesks();
                 seatsNumber.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -549,6 +552,8 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
         builderSingle.setIcon(R.drawable.ic_seat);
         builderSingle.setTitle("Available Seats");
 
+
+
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
         for(String seat: seatsArray){
             arrayAdapter.add(seat);
@@ -567,6 +572,8 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
               String strName = arrayAdapter.getItem(which);
               AlertDialog.Builder builderInner = new AlertDialog.Builder(MainActivity.this);
               LayoutInflater factory = LayoutInflater.from(MainActivity.this);
+
+
               final View view = factory.inflate(R.layout.available_seat_image, null);
               view.setBackground(verticalImage);
 
