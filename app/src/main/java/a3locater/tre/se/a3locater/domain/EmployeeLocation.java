@@ -4,11 +4,12 @@ public class EmployeeLocation {
     private String empName;
     private String location;
     private String locationImage;
-
-    public EmployeeLocation(String empName, String location, String locationImage) {
+    private String profilePic;
+    public EmployeeLocation(String empName, String location, String locationImage,String profilePic) {
         this.empName = empName;
         this.location = location;
         this.locationImage = locationImage;
+        this.profilePic = profilePic;
     }
 
     public String getEmpName() {
@@ -23,12 +24,13 @@ public class EmployeeLocation {
         return locationImage;
     }
 
+    public String getProfilePic(){ return  profilePic;}
     @Override
     public String toString() {
         return "EmployeeLocation{" +
                 "empName='" + empName + '\'' +
                 ", location='" + location + '\'' +
                 ", locationImage='" + locationImage + '\'' +
-                '}';
+                ", profilePic="+profilePic+"}";
     }
 }

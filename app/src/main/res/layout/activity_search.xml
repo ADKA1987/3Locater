@@ -23,7 +23,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/navigation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorPrimary"
+            app:itemIconTint="@color/colorAccent"
+            app:itemTextColor="@color/colorAccent"
+            app:menu="@menu/bottom_navigation_items">
+
+
+        </android.support.design.widget.BottomNavigationView>
+
         <LinearLayout
+            android:id="@+id/linearSearch"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
@@ -55,7 +71,7 @@
                 android:visibility="visible"
                 app:srcCompat="@drawable/searchmaterial" />
         </LinearLayout>
-        <LinearLayout
+        <!--<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
@@ -81,15 +97,18 @@
             <Spinner
                 android:id="@+id/area_spinner"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
+        </LinearLayout>-->
     </android.support.design.widget.AppBarLayout>
-
 
     <ScrollView
         android:id="@+id/search_form"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="@+id/linearSearch"
+        tools:ignore="NotSibling">
+
 
         <LinearLayout
             android:id="@+id/searchList"
@@ -99,10 +118,18 @@
             android:gravity="top|center"
             android:orientation="vertical"
             tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteY="83dp"></LinearLayout>
+            tools:layout_editor_absoluteY="83dp">
+
+            <FrameLayout
+                android:id="@+id/frame_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/navigation"
+                android:animateLayoutChanges="true">
+
+            </FrameLayout>
 
 
-
+        </LinearLayout>
     </ScrollView>
-
 </android.support.constraint.ConstraintLayout>

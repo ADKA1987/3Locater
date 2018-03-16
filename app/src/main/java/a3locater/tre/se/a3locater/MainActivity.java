@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity
     private Integer responseStatus;
     private DrawerLayout mDrawerLayout;
     private FloatingActionButton fab;
-    private  Drawable verticalImage;
+    private  Drawable verticalImage, navPic;
     private Location locations;
      @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,8 +140,14 @@ public class MainActivity extends AppCompatActivity
                 navMenu.findItem(R.id.nav_bookArea).setVisible(false);
             }
 
-        fab = findViewById(R.id.main_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+         byte[] decodedString = Base64.decode(mIntent.getSerializableExtra("profilePic").toString(), Base64.DEFAULT);
+         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+         verticalImage = new BitmapDrawable(getResources(),decodedByte );
+         userImageNav.setImageDrawable(verticalImage);
+
+         fab = findViewById(R.id.main_fab);
+         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                getMyLocationFromFile();
@@ -185,8 +191,8 @@ public class MainActivity extends AppCompatActivity
                 byte[] decodedString = Base64.decode(locations.getFloorPlans().get(randImage.nextInt(1)+4), Base64.DEFAULT);
                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
-                verticalImage = new BitmapDrawable(getResources(),decodedByte );
-                userImageNav.setImageDrawable(verticalImage);
+                navPic = new BitmapDrawable(getResources(),decodedByte );
+                //userImageNav.setImageDrawable(navPic);
 
                 final List<String> availableSeats = locations.getDesks();
                 seatsNumber.setOnClickListener(new View.OnClickListener() {
@@ -314,7 +320,9 @@ public class MainActivity extends AppCompatActivity
             intent = new Intent(getApplicationContext(), LoginActivity.class);
             File file = new File(this.getFilesDir(),"3Locator");
             File gpxfile = new File(file, "mytextfile.txt");
+            File locationfile = new File(file, "mylocation.txt");
             gpxfile.delete();
+            locationfile.delete();
             startActivity(intent);
         }else if (id == R.id.nav_bookArea){
             intent = new Intent(getApplicationContext(),BookAreaActivity.class);
@@ -575,7 +583,7 @@ private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
 
 
               final View view = factory.inflate(R.layout.available_seat_image, null);
-              view.setBackground(verticalImage);
+              view.setBackground(navPic);
 
               builderInner.setMessage(strName);
               //builderInner.setTitle("Your Selected Item is");

@@ -67,11 +67,12 @@ public class Search extends AsyncTask<String, String, EmployeeLocation> {
             String name = jObj.getString("name");
             String location = jObj.getString("locationId");
             String locationImage = jObj.getString("floorPlan");
+            String profilePic = jObj.getString("profilePic");
             // String isbn = items.getJSONObject(i).getJSONObject("volumeInfo").getJSONArray("industryIdentifiers").getJSONObject(1).getString("identifier");
             //the value of progress is a placeholder here....
-            employeeName = new EmployeeLocation(name, location, locationImage);
+            employeeName = new EmployeeLocation(name, location, locationImage,profilePic);
 
-            Log.v("EmployeeLocation", "name "+ name + ", location "+ location+", locationImage "+locationImage );
+            Log.v("EmployeeLocation", "name "+ name + ", location "+ location+", locationImage "+locationImage+ ", profilePic"+ profilePic);
         } catch (JSONException e) {
             Log.e("EmployeeLocation", "unexpected JSON exception", e);
         }
@@ -104,7 +105,7 @@ public class Search extends AsyncTask<String, String, EmployeeLocation> {
     @Override
     protected void onPostExecute(EmployeeLocation employeeLocation) {
         if (null == employeeLocation){
-            employeeLocation = new EmployeeLocation("Not Found","Not Found","Not Found");
+            employeeLocation = new EmployeeLocation("Not Found","Not Found","Not Found", "Not Found");
         }
         System.out.println(employeeLocation.toString());
         super.onPostExecute(employeeLocation);
